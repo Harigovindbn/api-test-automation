@@ -1,0 +1,78 @@
+name: API Automation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-automation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rest-assured:
+    name: RestAssured API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Run RestAssured test suite
+        run: mvn -B -ntp clean test
+
+      - name: Generate Allure HTML report
+        if: always()
+        run: mvn -B -ntp -DskipTests allure:report
+
+      - name: Upload RestAssured evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rest-assured-evidence
+          if-no-files-found: warn
+          path: |
+            target/surefire-reports/
+            target/allure-results/
+            target/site/allure-maven-plugin/
+
+  postman-newman:
+    name: Postman and Newman tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install Newman dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run Postman collection
+        run: npm run test:postman
+
+      - name: Upload Newman evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-evidence
+          if-no-files-found: warn
+          path: target/newman/

@@ -19,7 +19,7 @@ public final class ApiSpecifications {
     public static RequestSpecification request() {
         return new RequestSpecBuilder()
                 .setBaseUri(ApiConfig.baseUrl())
-                .setAccept(ContentType.JSON)
+                .addHeader("Accept", "application/json")
                 .setContentType(ContentType.JSON)
                 .addFilter(new AllureRestAssured())
                 .build();

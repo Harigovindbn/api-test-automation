@@ -1,0 +1,10 @@
+target/
+allure-results/
+allure-report/
+node_modules/
+.idea/
+.vscode/
+*.iml
+*.log
+.DS_Store
+postman/reports/

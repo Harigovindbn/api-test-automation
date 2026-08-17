@@ -1,0 +1,14 @@
+{
+  "name": "api-test-automation-postman",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Newman runner for the Restful Booker Postman collection",
+  "scripts": {
+    "pretest:postman": "node -e \"require('fs').mkdirSync('target/newman', { recursive: true })\"",
+    "test:postman": "newman run postman/Restful-Booker.postman_collection.json -e postman/Restful-Booker.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export target/newman/newman-results.xml --reporter-htmlextra-export target/newman/newman-report.html --timeout-request 15000"
+  },
+  "devDependencies": {
+    "newman": "6.2.1",
+    "newman-reporter-htmlextra": "1.23.1"
+  }
+}
